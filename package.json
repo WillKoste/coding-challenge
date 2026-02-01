@@ -7,7 +7,8 @@
 		"dev": "prisma generate && prisma migrate deploy && nodemon --watch src --ext ts,tsx,json --exec tsx ./src/server",
 		"test": "vitest",
 		"prisma:generate": "prisma generate",
-		"prisma:migrate": "prisma migrate dev --name addUsers",
+		"prisma:migrate": "prisma migrate dev",
+		"prisma:migrate:deploy": "prisma migrate deploy",
 		"build": "prisma generate && tsc",
 		"lint": "eslint --max-warnings 0",
 		"typecheck": "tsc --noEmit"

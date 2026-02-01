@@ -6,6 +6,7 @@
 - Express
 - Docker
 - SQLite
+- GeoIP Lite
 
 ## Requirements
 
@@ -34,3 +35,15 @@
 - [geoip2-node SDK](https://www.npmjs.com/package/@maxmind/geoip2-node)
 - [GeoIP Docs](https://dev.maxmind.com/geoip/geolocate-an-ip/web-services/)
 - [Implementing gRPC](https://bhirmbani.medium.com/complete-guide-creating-apis-using-grpc-js-and-grpc-web-with-typescript-f2496c4499fb)
+- [A personal project that I've been working on](https://github.com/WillKoste/pharmacy)
+
+## Final Notes
+
+I ended up working a little bit over 4 hours - I wanted to get as close to my vision as I could in the short timespan. Here are some of the tasks that I'd want to complete (with more time):
+
+1. Resolve the Dockerfile issue, which prevents the server from running in the container. (the path to the prisma config file is giving me trouble after prisma generate && tsc && moving to image)
+2. Finish the unit tests. I added the whitelisted_location table last minute because I wanted to display some sort of realistic solution.
+3. I wanted to finish gRPC.
+
+Please let me know if you have any comments or questions. If you'd like to see more, I'd love to finish some of the WIP items (if given more time).
+Thanks Avoxi team!

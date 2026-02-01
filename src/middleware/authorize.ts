@@ -26,6 +26,7 @@ export const authorize = async (req: Request<{thing: string}>, res: Response, ne
 		throw new Error(ErrorMessage.UNAUTHORIZED);
 	}
 
-	await validateWhitelistedIP(req.ip, decoded.location);
+	// WARNING: We need a new service that takes in the location name (instead of an array of valid whitelisted_locations)
+	// await validateWhitelistedIP(req.ip, decoded.location);
 	next();
 };

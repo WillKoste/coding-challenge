@@ -12,6 +12,15 @@ model user {
   first_name           String
   last_name            String
   email                String @unique
-  whitelisted_location String
   password             String
+
+  whitelisted_location whitelisted_location[]
+}
+
+model whitelisted_location {
+  id                   Int    @id @default(autoincrement())
+  country_name String
+  user_id Int
+  is_valid Boolean @default(false)
+  user user @relation(fields: [user_id], references: [id])
 }

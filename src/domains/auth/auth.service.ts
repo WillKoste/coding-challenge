@@ -2,7 +2,7 @@ import argon2 from 'argon2';
 import {ErrorMessage, LoginServiceProps} from './auth.types.js';
 import {geoIp} from '../../../maxmindClient.js';
 import {prisma} from '../../../index.js';
-import {user} from '../../../generated/index.js';
+import {whitelisted_location} from '../../../generated/index.js';
 
 /**
  * These service functions can be used in middleware for validating the
@@ -10,11 +10,7 @@ import {user} from '../../../generated/index.js';
  */
 
 export const validatePassword = async (password: string, databasePassword: string) => {
-	const hashedPassword = await argon2.hash(password);
 	const isAuthorized = await argon2.verify(databasePassword, password);
-
-	// const isAuthorized = hashedPassword === databasePassword;
-	console.log({isAuthorized, databasePassword, hashedPassword});
 	if (!isAuthorized) {
 		throw new Error(`[auth.service.validatePassword] Error - ${ErrorMessage.INVALID_CREDENTIALS}`);
 	}
@@ -28,22 +24,28 @@ export const getCountryByIP = async (ip: string) => {
 	return country.country.names.en;
 };
 
-export const validateWhitelistedIP = async (ip: string, userLocation: string) => {
+export const validateWhitelistedIP = async (ip: string, validUserLocations: Pick<whitelisted_location, 'id' | 'country_name' | 'is_valid'>[]) => {
 	const ipCountry = await getCountryByIP(ip);
-	return ipCountry === userLocation;
+	return validUserLocations.some((location) => location.country_name === ipCountry);
 };
 
-export const login = async (params: LoginServiceProps): Promise<Pick<user, 'email' | 'id' | 'whitelisted_location'>> => {
+export const login = async (params: LoginServiceProps) => {
 	const {email, ip, password} = params;
 	const user = await prisma.user.findUnique({
 		where: {
 			email
 		},
 		select: {
-			email: true,
-			password: true, // Make sure this doesn't make it to the frontend
 			id: true,
-			whitelisted_location: true
+			email: true,
+			password: true, // Make sure this doesn't make it to the frontend,
+			whitelisted_location: {
+				select: {
+					id: true,
+					country_name: true,
+					is_valid: true
+				}
+			}
 		}
 	});
 
@@ -51,8 +53,10 @@ export const login = async (params: LoginServiceProps): Promise<Pick<user, 'emai
 		Error(`[auth.service.login] Error - ${ErrorMessage.INVALID_CREDENTIALS}`);
 	}
 
+	const validWhitelistedCountries = user.whitelisted_location.filter((location) => location.is_valid);
+
 	await validatePassword(password, user.password);
-	await validateWhitelistedIP(ip, user.whitelisted_location);
+	await validateWhitelistedIP(ip, validWhitelistedCountries);
 	return {
 		id: user.id,
 		email: user.email,
