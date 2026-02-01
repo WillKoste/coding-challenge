@@ -13,9 +13,8 @@ const MOCK_COOKIE: AuthToken = {
 	iat: 1769560466
 };
 
-const MOCK_JWT = jwt.sign(MOCK_COOKIE, process.env.JWT_SECRET);
-
 export const authorize = async (req: Request<{thing: string}>, res: Response, next: NextFunction) => {
+	const MOCK_JWT = jwt.sign(MOCK_COOKIE, process.env.JWT_SECRET);
 	const token = MOCK_JWT; // req.cookies['x-auth-token']
 	const decoded = jwt.verify(token, process.env.JWT_SECRET) as AuthToken | undefined; // I don't like casting right here, but even though there's a time limitation, I want type safety
 

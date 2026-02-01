@@ -1,8 +1,8 @@
-import {hash} from 'argon2';
+import argon2 from 'argon2';
 import {ErrorMessage, LoginServiceProps} from './auth.types.js';
-import {db} from '../../server.js';
-import {UserEntity} from '../user/user.types.js';
-import {maxMindClient} from '../../config/maxmindClient.js';
+import {geoIp} from '../../../maxmindClient.js';
+import {prisma} from '../../../index.js';
+import {user} from '../../../generated/index.js';
 
 /**
  * These service functions can be used in middleware for validating the
@@ -10,28 +10,42 @@ import {maxMindClient} from '../../config/maxmindClient.js';
  */
 
 export const validatePassword = async (password: string, databasePassword: string) => {
-	const hashedPassword = await hash(password);
-	const isAuthorized = hashedPassword === databasePassword;
-	if (!isAuthorized) Error(`[auth.service.validatePassword] Error - ${ErrorMessage.INVALID_CREDENTIALS}`);
+	const hashedPassword = await argon2.hash(password);
+	const isAuthorized = await argon2.verify(databasePassword, password);
+
+	// const isAuthorized = hashedPassword === databasePassword;
+	console.log({isAuthorized, databasePassword, hashedPassword});
+	if (!isAuthorized) {
+		throw new Error(`[auth.service.validatePassword] Error - ${ErrorMessage.INVALID_CREDENTIALS}`);
+	}
+};
+
+export const getCountryByIP = async (ip: string) => {
+	if (!ip) throw new Error(`[auth.service.validateWhitelistedIP] Error - ${ErrorMessage.BAD_REQUEST}`);
+
+	const client = await geoIp;
+	const country = await client.country(ip);
+	return country.country.names.en;
 };
 
 export const validateWhitelistedIP = async (ip: string, userLocation: string) => {
-	if (!ip) throw new Error(`[auth.service.validateWhitelistedIP] Error - ${ErrorMessage.BAD_REQUEST}`);
-
-	const location = await maxMindClient.city(ip);
-	if (!location || !location.city) {
-		throw new Error(`[auth.service.validateWhitelistedIP] Error - ${ErrorMessage.SERVER_ERROR} (missing/invalid location data)`);
-	}
-
-	if (userLocation !== location.city.names.en) {
-		throw new Error(`[auth.service.validateWhitelistedIP] Error - ${ErrorMessage.UNAUTHORIZED}`);
-	}
-	return location;
+	const ipCountry = await getCountryByIP(ip);
+	return ipCountry === userLocation;
 };
 
-export const login = async (params: LoginServiceProps) => {
+export const login = async (params: LoginServiceProps): Promise<Pick<user, 'email' | 'id' | 'whitelisted_location'>> => {
 	const {email, ip, password} = params;
-	const user = db.prepare(`SELECT * FROM users u WHERE u.email = ?`).get(email) as UserEntity | undefined;
+	const user = await prisma.user.findUnique({
+		where: {
+			email
+		},
+		select: {
+			email: true,
+			password: true, // Make sure this doesn't make it to the frontend
+			id: true,
+			whitelisted_location: true
+		}
+	});
 
 	if (!user) {
 		Error(`[auth.service.login] Error - ${ErrorMessage.INVALID_CREDENTIALS}`);
@@ -39,5 +53,9 @@ export const login = async (params: LoginServiceProps) => {
 
 	await validatePassword(password, user.password);
 	await validateWhitelistedIP(ip, user.whitelisted_location);
-	return user;
+	return {
+		id: user.id,
+		email: user.email,
+		whitelisted_location: user.whitelisted_location
+	};
 };

@@ -20,3 +20,17 @@
 - Create a `isValidLocation` service function (in this sample project, we will use it in the `login` route, but it could also be used in an express middleware function to protect every request.)
 - The `isValidLocation` should receive the IP adress (accessed via the express route's `req.ip`) and request data from the
 - Create the Dockerfile
+
+## Getting Started
+
+1. `npm i`
+2. `npm run dev` (This will generate prisma schemas, run prisma migration, & start the dev server)
+
+## My Resources
+
+- [Chat GPT (Round 1)](https://chatgpt.com/share/697ea053-df70-800c-a0c8-de1f2363ab7a)
+- [Chat GPT (Round 2)](https://chatgpt.com/share/697ea081-bd4c-800c-bab6-d6fe2aeee6b9)
+- [Prisma](https://www.prisma.io/docs/orm/overview/databases/sqlite)
+- [geoip2-node SDK](https://www.npmjs.com/package/@maxmind/geoip2-node)
+- [GeoIP Docs](https://dev.maxmind.com/geoip/geolocate-an-ip/web-services/)
+- [Implementing gRPC](https://bhirmbani.medium.com/complete-guide-creating-apis-using-grpc-js-and-grpc-web-with-typescript-f2496c4499fb)

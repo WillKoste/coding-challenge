@@ -5,9 +5,9 @@
     "lib": ["ES2022"],
     "target": "es2022",
     "outDir": "./dist",
-    "rootDir": "./src",
-    "noUnusedLocals": true
+    "rootDir": ".",
+    "noUnusedLocals": true,
   },
   "exclude": ["node_modules", "./dist"],
-  "include": ["**/*.ts"]
+  "include": ["**/*.ts", "**/*.js"],
 }

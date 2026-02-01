@@ -1,13 +1,13 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "./src/generated"
+  output   = "./generated"
 }
 
 datasource db {
   provider = "sqlite"
 }
 
-model User {
+model user {
   id                   Int    @id @default(autoincrement())
   first_name           String
   last_name            String
