@@ -11,10 +11,7 @@ export default defineConfig({
 		root,
 		include: [suffix],
 		exclude: excludeDirs,
-		env: {
-			MAX_MIND_ACCOUNT_ID: '1291087',
-			MAX_MIND_LICENSE_KEY: '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'
-		},
+		env: {},
 		coverage: {
 			enabled: true,
 			provider: 'v8',
