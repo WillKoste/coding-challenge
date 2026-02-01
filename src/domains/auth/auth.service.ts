@@ -17,7 +17,7 @@ export const validatePassword = async (password: string, databasePassword: strin
 };
 
 export const getCountryByIP = async (ip: string) => {
-	if (!ip) throw new Error(`[auth.service.validateWhitelistedIP] Error - ${ErrorMessage.BAD_REQUEST}`);
+	if (!ip) throw new Error(`[auth.service.getCountryByIP] Error - ${ErrorMessage.BAD_REQUEST}`);
 
 	const client = await geoIp;
 	const country = await client.country(ip);
@@ -26,7 +26,8 @@ export const getCountryByIP = async (ip: string) => {
 
 export const validateWhitelistedIP = async (ip: string, validUserLocations: Pick<whitelisted_location, 'id' | 'country_name' | 'is_valid'>[]) => {
 	const ipCountry = await getCountryByIP(ip);
-	return validUserLocations.some((location) => location.country_name === ipCountry);
+	const isValidLocation = validUserLocations.some((location) => location.country_name === ipCountry);
+	if (!isValidLocation) throw new Error(`[auth.service.validateWhitelistedIP] Error - ${ErrorMessage.BAD_REQUEST}`);
 };
 
 export const login = async (params: LoginServiceProps) => {
