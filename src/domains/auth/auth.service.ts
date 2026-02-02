@@ -40,25 +40,27 @@ export const login = async (params: LoginServiceProps) => {
 			id: true,
 			email: true,
 			password: true, // Make sure this doesn't make it to the frontend,
-			whitelisted_location: {
+			whitelisted_locations: {
 				select: {
 					id: true,
-					country_name: true,
-					is_valid: true
+					is_valid: true,
+					country_name: true
 				}
 			}
 		}
 	});
 
-	if (!user) {
-		Error(`[auth.service.login] Error - ${ErrorMessage.INVALID_CREDENTIALS}`);
+	console.log('The user: ', user)
+
+	if (!user || !password) {
+		throw new Error(`[auth.service.login] Error - ${ErrorMessage.INVALID_CREDENTIALS}`);
 	}
 
 	await validatePassword(password, user.password);
-	await validateWhitelistedIP(ip, user.whitelisted_location);
+	await validateWhitelistedIP(ip, user.whitelisted_locations);
 	return {
 		id: user.id,
 		email: user.email,
-		whitelisted_location: user.whitelisted_location
+		whitelisted_location: user.whitelisted_locations
 	};
 };
