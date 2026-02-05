@@ -46,3 +46,16 @@ I ended up working a little bit over 4 hours - I wanted to get as close to my vi
 
 Please let me know if you have any comments or questions. If you'd like to see more, I'd love to finish some of the WIP items (if given more time).
 Thanks Avoxi team!
+
+
+
+## Code Review Interview
+
+### My General requirements
+
+* Everything must have valid type definition. Should never rely on the `any` type as it defeats the purpose of TS.
+* Variable names: should not be abbreviated, should be descriptive, should walk other engineers through the code
+* All team coding starts being met (this should be automated)
+* ALL GitHub Actions must pass
+* Consistent patterns
+* Personal Preference: A lot of the time, I would rather have a function be readable & have more lines than use syntax sure to try and condense something as small as possible. The TS file gets compiled in the end anyways.
